@@ -27,6 +27,10 @@ open class Client: NSObject {
     public var shouldPrintWebSocketTrace = false
     public var userDisconnected = false
     var isConnecting = false
+    
+    // WebSocket initialization block
+    // Allow to set additional websocket parameters, ssl certificate pinning for example
+    public static var webSocketInit: ((WebSocket) -> ())? = nil
 
     // This allows us to easily plug in another request ID generation scheme, or more easily change the request id type
     // if needed (technically this could be a string).
@@ -236,6 +240,7 @@ extension Client {
             let socket = WebSocket(url: host)
             socket.delegate = self
             socket.callbackQueue = queue
+            Client.webSocketInit?(socket)
             socket.connect()
             isConnecting = true
             userDisconnected = false
