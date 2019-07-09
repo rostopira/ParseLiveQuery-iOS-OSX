@@ -247,6 +247,20 @@ extension Client {
             return socket
         }()
     }
+ 
+    public func reconnectIfDisconnected() {
+        guard socket == nil && !isConnecting else { return }
+        socket = {
+            let socket = WebSocket(url: host)
+            socket.delegate = self
+            socket.callbackQueue = queue
+            Client.webSocketInit?(socket)
+            socket.connect()
+            isConnecting = true
+            userDisconnected = false
+            return socket
+        }()
+    }
 
     /**
      Explicitly disconnects this client from the server.
